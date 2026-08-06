@@ -29,3 +29,40 @@ dependencies {
 
 
 # Tutorial
+
+Call `MLKitOCRWrapper.instance.ScanImageText()` by passing your target `Texture2D`, the `SourceLang` enum converted to an API key, and a callback function to handle the output text:
+
+```csharp
+using UnityEngine;
+using TMPro;
+
+public class OCRDemo : MonoBehaviour
+{
+    [SerializeField] private Texture2D textureToScan;
+    [SerializeField] private TMP_Text resultText;
+    [SerializeField] private SourceLang sourceLang = SourceLang.Japanese;
+
+    public void PerformOCR()
+    {
+        // Convert the SourceLang enum to the required ML Kit API key
+        string langKey = MLKitOCRWrapper.GetSourceLangApiKey(sourceLang);
+
+        // Run the OCR scan asynchronously
+        MLKitOCRWrapper.instance.ScanImageText(textureToScan, langKey, (output) => 
+        {
+            Debug.Log($"Extracted Text: {output}");
+            resultText.text = output;
+        });
+    }
+}
+```
+## Supported Languages
+```csharp
+public enum SourceLang
+{
+    latin,
+    japanese,
+    korean,
+    chinese,
+    devanagari
+}

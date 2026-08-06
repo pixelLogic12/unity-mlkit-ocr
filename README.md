@@ -66,3 +66,9 @@ public enum SourceLang
     chinese,
     devanagari
 }
+```
+
+## 📥 Download Demo
+
+Try out the app on your Android device:
+* [Download latest Demo APK](https://github.com/your-username/your-repo-name/releases/latest/download/app-release.apk)

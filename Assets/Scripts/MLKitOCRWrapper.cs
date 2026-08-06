@@ -19,8 +19,14 @@ public class MLKitOCRWrapper : MonoBehaviour
     void Awake()
     {
         if (instance == null)
+        {
             instance = this;
 
+            transform.parent = null;
+            DontDestroyOnLoad(gameObject);
+        }
+        else Destroy(gameObject);
+        
         // Only initialize if running on an actual Android device
         if (Application.platform == RuntimePlatform.Android)
         {

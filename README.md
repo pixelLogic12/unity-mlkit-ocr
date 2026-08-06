@@ -71,4 +71,4 @@ public enum SourceLang
 ## 📥 Download Demo
 
 Try out the app on your Android device:
-* [Download latest Demo APK](https://github.com/your-username/your-repo-name/releases/latest/download/app-release.apk)
+* [Download latest Demo APK](https://github.com/pixelLogic12/unity-mlkit-ocr/releases/latest/download/Demo.apk)

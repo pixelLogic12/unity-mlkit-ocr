@@ -43,7 +43,7 @@ using TMPro;
 public class NativeCameraOCRManager : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private SourceLang sourceLang = SourceLang.japanese;
+    [SerializeField] private MLKitOCRWrapper.SourceLang sourceLang = SourceLang.japanese;
     [SerializeField] private TMP_Text outputTextUI;
 
     private Texture2D cachedPhotoTexture;

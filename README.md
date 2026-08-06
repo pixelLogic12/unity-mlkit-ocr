@@ -32,27 +32,82 @@ dependencies {
 
 Call `MLKitOCRWrapper.instance.ScanImageText()` by passing your target `Texture2D`, the `SourceLang` enum converted to an API key, and a callback function to handle the output text:
 
+This project seamlessly pairs with [Yasir Kula's Native Camera for Unity](https://github.com/yasirkula/UnityNativeCamera) to capture high-resolution photos on Android/iOS and immediately extract text.
+
+> ⚠️ **Important:** Set `markTextureNonReadable: false` when calling `NativeCamera.LoadImageAtPath()` so the ML Kit wrapper can access the pixel data!
+
 ```csharp
 using UnityEngine;
 using TMPro;
 
-public class OCRDemo : MonoBehaviour
+public class NativeCameraOCRManager : MonoBehaviour
 {
-    [SerializeField] private Texture2D textureToScan;
-    [SerializeField] private TMP_Text resultText;
-    [SerializeField] private SourceLang sourceLang = SourceLang.Japanese;
+    [Header("Settings")]
+    [SerializeField] private SourceLang sourceLang = SourceLang.japanese;
+    [SerializeField] private TMP_Text outputTextUI;
 
-    public void PerformOCR()
+    private Texture2D cachedPhotoTexture;
+
+    public void OpenCameraAndScan()
     {
-        // Convert the SourceLang enum to the required ML Kit API key
-        string langKey = MLKitOCRWrapper.GetSourceLangApiKey(sourceLang);
-
-        // Run the OCR scan asynchronously
-        MLKitOCRWrapper.instance.ScanImageText(textureToScan, langKey, (output) => 
+        // Check if camera is busy
+        if (NativeCamera.IsCameraBusy())
         {
-            Debug.Log($"Extracted Text: {output}");
-            resultText.text = output;
-        });
+            Debug.LogWarning("Camera app is already open or busy!");
+            return;
+        }
+
+        // 1. Take picture using Native Camera plugin
+        NativeCamera.TakePicture((filePath) =>
+        {
+            if (filePath == null)
+            {
+                Debug.Log("User exited camera without taking a photo.");
+                return;
+            }
+
+            Debug.Log($"Photo captured at: {filePath}");
+
+            // Clean up old texture memory to avoid memory leaks
+            if (cachedPhotoTexture != null)
+            {
+                Destroy(cachedPhotoTexture);
+            }
+
+            // 2. Load Texture2D (Must set markTextureNonReadable: false for OCR)
+            cachedPhotoTexture = NativeCamera.LoadImageAtPath(filePath, maxSize: 2048, markTextureNonReadable: false);
+
+            if (cachedPhotoTexture != null)
+            {
+                // 3. Convert SourceLang enum & run OCR scan
+                string apiKey = MLKitOCRWrapper.GetSourceLangApiKey(sourceLang);
+
+                MLKitOCRWrapper.instance.ScanImageText(cachedPhotoTexture, apiKey, (output) =>
+                {
+                    Debug.Log($"[OCR Result]: {output}");
+                    
+                    if (outputTextUI != null)
+                    {
+                        outputTextUI.text = string.IsNullOrEmpty(output) 
+                            ? "No text recognized." 
+                            : output;
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("Failed to load Texture2D from path.");
+            }
+        }, maxSize: 2048);
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up texture when object is destroyed
+        if (cachedPhotoTexture != null)
+        {
+            Destroy(cachedPhotoTexture);
+        }
     }
 }
 ```

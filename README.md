@@ -1,7 +1,9 @@
 # Prerequisites & Setup
 
+## 1.1 Set Up Prefab
+Go to `assets/prefab` and grab the MLKit prefab place it in the first scene of your project. 
 
-
+## 1.2 Set MainTemplate.gradle dependencies.
 1. Enable Custom Gradle Template in Unity
 
 Go to \*\*Project Settings > Player > Android Settings > Publishing Settings\*\* and enable \*\*Custom Main Gradle Template\*\* (`mainTemplate.gradle`).
